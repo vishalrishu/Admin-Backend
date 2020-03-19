@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Client = require('pg').Client
-let client = new Client("")
+let client = new Client("Paste your DB URI here") // Paste DB URI
 const uuid = require('uuid/v1')
 client.connect()
 
