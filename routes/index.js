@@ -40,9 +40,10 @@ router.post('/interview', async (req, res) => {
   if(interviewDetails.participants.length <2) {
     return res.json({error: 'Atleast two participants required'})
   }
-
+console.log(interviewDetails)
   checkExistingInterviews(interviewDetails.participants, interviewDetails.i_id, interviewDetails.startTS, interviewDetails.endTS)
   .then(result=>{
+    console.log(result)
   if(result.length) {
     return res.json({error: 'Schedule is overlapping'})
   }
@@ -70,8 +71,8 @@ client.query(query, [interviewDetails.i_id, interviewDetails.description, interv
 
 function checkExistingInterviews(participants, interviewId, startTS, endTS) {
   return new Promise((resolve, reject)=>{
-    const query = `select i.i_id from interview i inner join participant_interview pi on i.i_id = $1 AND i.i_id = pi.i_id AND pi.p_id in (${participants}) AND ((i.startTS < $2 AND i.endTS > $2) OR (i.startTS < $3 AND i.endTS > $3))`
-    client.query(query,[interviewId, startTS, endTS], (err, result) => {
+    const query = `select i.i_id from interview i inner join participant_interview pi on i.i_id = pi.i_id AND pi.p_id in (${participants}) AND ((i.startTS <= $1 AND i.endTS >= $1) OR (i.startTS <= $2 AND i.endTS >= $2))`
+    client.query(query,[startTS, endTS], (err, result) => {
       if(err) {
         return reject(err)
       }
